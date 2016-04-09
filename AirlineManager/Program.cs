@@ -13,7 +13,7 @@ namespace AirlineManager
         static void Main(string[] args)
         {
             Console.WriteLine("Main method in class Program.");
-            Airline zachepilovkaAir = new Airline(5);
+            Airline zachepilovkaAir = new Airline(7);
             IFlightPrinter flightPrinter = new ConsoleFlightPrinter();
             Passenger[] passengers = new Passenger[10];
             passengers[0] = new Passenger("Truman", "Capote", "American", "GG 554493", DateTime.Now.AddDays(-5000),
