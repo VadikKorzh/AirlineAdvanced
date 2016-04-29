@@ -6,7 +6,7 @@
     <ProjectGuid>{F1C16FF0-5A64-4394-911E-EC3607028783}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AirlineTests</RootNamespace>
+    <RootNamespace>KRZHK.AirlineTests</RootNamespace>
     <AssemblyName>AirlineTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -50,8 +50,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="AirlineClassTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AirlineLibrary\AirlineLibrary.csproj">
+      <Project>{5337d675-e458-435a-b9b9-9b596e233c5f}</Project>
+      <Name>AirlineLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

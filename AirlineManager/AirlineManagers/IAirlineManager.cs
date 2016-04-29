@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AirlineLibrary;
+using KRZHK.AirlineLibrary;
 
-namespace AirlineManager.AirlineManagers
+namespace KRZHK.AirlineManager.AirlineManagers
 {
     interface IAirlineManager
     {

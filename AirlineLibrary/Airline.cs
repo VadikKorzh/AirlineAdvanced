@@ -1,72 +1,46 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AirlineLibrary
+namespace KRZHK.AirlineLibrary
 {
-    public class Airline
+    public class Airline : IEnumerable<Flight>
     {
         int _maxNumberOfFlights;
-        int _numberOfFlights = 0;
-        Flight[] _flights;
 
-        public Flight[] Flights
-        {
-            get
-            {
-                return CloneFlights();
-            }
-            private set
-            {
-                _flights = value;
-            }
-        }
+        public List<Flight> Flights { get; private set; }
 
-        public int NumberOfFlights
-        {
-            get { return _numberOfFlights; }
-        }
-
-        public Airline(int maxNumberOfFlights)
+        public Airline(int maxNumberOfFlights = 100)
         {
             this._maxNumberOfFlights = maxNumberOfFlights;
-            Flights = new Flight[this._maxNumberOfFlights];
+            Flights = new List<Flight>();
         }
 
         public bool IsFull()
         {
-            return _numberOfFlights == _maxNumberOfFlights;
+            return Flights.Count == _maxNumberOfFlights;
         }
 
-        Flight[] CloneFlights()
-        {
-            Flight[] tempFlights = new Flight[_flights.Length];
+        //Flight[] CloneFlights()
+        //{
+        //    Flight[] tempFlights = new Flight[_flights.Length];
 
-            for (int i = 0; i < _flights.Length; i++)
-            {
-                tempFlights[i] = (_flights[i] != null) ? _flights[i].Clone() : null;
-            }
+        //    for (int i = 0; i < _flights.Length; i++)
+        //    {
+        //        tempFlights[i] = (_flights[i] != null) ? _flights[i].Clone() : null;
+        //    }
 
-            return tempFlights;
-        }
+        //    return tempFlights;
+        //}
 
         public void AddFlight(Flight flight)
         {
-            int i;
-            if (_numberOfFlights < _maxNumberOfFlights)
+            if (!IsFull())
             {
-                for (i = 0; i < _maxNumberOfFlights; i++)
-                {
-                    if (_flights[i] == null)
-                    {
-                        break;
-                    }
-                }
-                _flights[i] = flight.Clone();
-                _numberOfFlights++;
+                Flights.Add(flight);
             }
             else
             {
@@ -74,53 +48,66 @@ namespace AirlineLibrary
             }
         }
 
-        public void RemoveFlight(Flight flight)
+        public void RemoveFlight(Flight flightToRemove)
         {
-            for (int i = 0; i < _maxNumberOfFlights; i++)
+            Flight foundFlightToRemove = Flights.Find((f) => f.Number == flightToRemove.Number);
+            if (foundFlightToRemove != null)
             {
-                if (_flights[i] != null && _flights[i].Number == flight.Number)
-                {
-                    _flights[i] = null;
-                    _numberOfFlights--;
-                    break;
-                }
+                Flights.Remove(foundFlightToRemove);
+            }
+            else
+            {
+                throw new ArgumentException("The airline doesn't contain the specified flight.");
             }
         }
 
         public void AddPassenger(Passenger passengerToAdd, int flightNumber)
         {
-            for (int i = 0; i < _maxNumberOfFlights; i++)
+            Flight flightToEdit = Flights.Find((f) => f.Number == flightNumber);
+
+            if (flightToEdit != null)
             {
-                if (_flights[i] != null && _flights[i].Number == flightNumber)
+                try
                 {
-                    try
-                    {
-                        _flights[i].AddPassenger(passengerToAdd);
-                    }
-                    catch (ArgumentException)
-                    {
-                        throw;
-                    }
-                    break;
+                    flightToEdit.AddPassenger(passengerToAdd);
                 }
+                catch (ArgumentException)
+                {
+                    throw;
+                }
+            }
+            else
+            {
+                throw new ArgumentException("The airline doesn't contain the specified flight.");
             }
         }
 
         public void RemovePassenger(Passenger passengerToRemove)
         {
-            for (int i = 0; i < _maxNumberOfFlights; i++)
+            Passenger foundPassengerToRemove = null;
+            foreach (Flight flight in Flights)
             {
-                if (_flights[i] != null)
+                foundPassengerToRemove = flight.Passengers.Find((p) => p.Passport.Equals(passengerToRemove.Passport));
+                if (foundPassengerToRemove != null)
                 {
-                    for (int j = 0; j < _flights[i].Passengers.Length; j++)
-                    {
-                        if (_flights[i].Passengers[j] != null && _flights[i].Passengers[j].Passport == passengerToRemove.Passport.ToUpper())
-                        {
-                            _flights[i].RemovePassenger(passengerToRemove);
-                        }
-                    }
+                    flight.RemovePassenger(foundPassengerToRemove);
+                    break;
                 }
             }
+            if (foundPassengerToRemove == null)
+            {
+                throw new ArgumentException("No such passenger has been found in the airline.");
+            }
+        }
+
+        public IEnumerator<Flight> GetEnumerator()
+        {
+            return ((IEnumerable<Flight>)Flights).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<Flight>)Flights).GetEnumerator();
         }
     }
 }

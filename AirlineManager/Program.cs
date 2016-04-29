@@ -3,23 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AirlineLibrary;
-using AirlineLibrary.FlightPrinters;
+using KRZHK.AirlineLibrary;
+using KRZHK.AirlineLibrary.FlightPrinters;
+using KRZHK.AirlineManager.AirlineManagers;
+using System.Diagnostics;
+using NLog;
 
-namespace AirlineManager
+namespace KRZHK.AirlineManager
 {
     class Program
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Main method in class Program.");
+            #region Tracing
+            //TraceSource traceSource = new TraceSource("airlineTraceSource");
+            //TextWriterTraceListener textTraceListener = new TextWriterTraceListener("trace.txt");
+            //traceSource.Switch = new SourceSwitch("arilineSourceSwitch");
+            //traceSource.Switch.Level = SourceLevels.All;
+
+            //textTraceListener.TraceOutputOptions = TraceOptions.DateTime;
+            //traceSource.Listeners.Clear();
+            //traceSource.Listeners.Add(textTraceListener);
+            //Trace.AutoFlush = true;
+
+            //traceSource.TraceEvent(TraceEventType.Information, 0, "Application started.");
+            #endregion Tracing
+
+            logger.Info("Application started.");
+
             Airline zachepilovkaAir = new Airline(7);
+            AirlineFactory airlineFactory = new AirlineFactory();
+            airlineFactory.PopulateAirline(zachepilovkaAir);
+
             IFlightPrinter flightPrinter = new ConsoleFlightPrinter();
-            Passenger[] passengers = new Passenger[10];
-            passengers[0] = new Passenger("Truman", "Capote", "American", "GG 554493", DateTime.Now.AddDays(-5000),
-                                        Sex.Male, new FlightTicket { Class = TicketClass.Business, Price = 350 }, 2222);
-            zachepilovkaAir.AddFlight(new Flight(FlightDirection.Arrival, DateTime.Now, 3333, "Ulaanbaatar", AirportGate.B1, FlightStatus.Departed, 350, 25, passengers));
-            flightPrinter.PrintFlightsInfo(zachepilovkaAir.Flights);
+            ConsoleAirlineManager zachepilovkaAirManager = new ConsoleAirlineManager(flightPrinter, zachepilovkaAir);
+            zachepilovkaAirManager.Manage();
+
+            //Passenger[] passengers = new Passenger[10];
+            //passengers[0]  = new Passenger("Truman", "Capote", "American", "GG 554493", DateTime.Now.AddDays(-5000),
+            //                            Sex.Male, new FlightTicket { Class = TicketClass.Business, Price = 350 }, 2222);
+            //zachepilovkaAir.AddFlight(new Flight(FlightDirection.Arrival, DateTime.Now, 3333, "Ulaanbaatar", AirportGate.B1, FlightStatus.Departed, 350, 25, passengers));
+
+            //flightPrinter.PrintFlightsInfo(zachepilovkaAir.Flights);
+
+            logger.Info("Application ended.");
         }
     }
 }

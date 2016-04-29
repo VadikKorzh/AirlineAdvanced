@@ -1,263 +1,52 @@
-﻿using AirlineLibrary.FlightPrinters;
+﻿using KRZHK.AirlineLibrary.FlightPrinters;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AirlineLibrary;
+using KRZHK.AirlineLibrary;
+using System.Configuration;
+using KRZHK.AirlineLibrary.Enums;
 
-namespace AirlineManager
+namespace KRZHK.AirlineManager.AirlineManagers
 {
     class ConsoleAirlineManager
     {
-        const string Culture = "en-US";
-        const int WindowHeight = 30;
-        const int WindowWidth = 113;
-        const decimal businessClassIncrement = 145;
-
-        Random random = new Random((int)DateTime.Now.Ticks);
-
         IFlightPrinter _flightPrinter;
+        Airline _airline;
 
-        public ConsoleAirlineManager(IFlightPrinter printer)
+        public ConsoleAirlineManager(IFlightPrinter printer, Airline airline)
         {
             _flightPrinter = printer;
+            _airline = airline;
         }
-
-        #region Creation of flights
-        
-        // creates a random date between "startYear" and "stopYear"
-        DateTime CreateRandomDate(int startYear, int stopYear)
-        {
-            if (startYear >= stopYear)
-            {
-                throw new ArgumentException("startYear must be less or equal to stopYear.");
-            }
-            else
-            {
-                DateTime startDate = new DateTime(startYear, 1, 1);
-                return startDate.AddDays(random.Next(0, (stopYear - startYear + 1) * 365));
-            }
-        }
-        
-        string CreateRandomPassportNumber()
-        {
-            StringBuilder passport = new StringBuilder();
-            int temp;
-            temp = random.Next(26);
-            passport.Append((char)('A' + temp));
-            temp = random.Next(26);
-            passport.Append((char)('A' + temp));
-            passport.Append(' ');
-            passport.Append(String.Format("{0:d6}", random.Next(999999)));
-            return passport.ToString();
-        }
-
-        FlightTicket CreateRandomTicket(decimal basePrice)
-        {
-            FlightTicket ticket = new FlightTicket();
-            int temp;
-            temp = random.Next(2);
-            ticket.Class = (TicketClass)temp;
-            // business class ticket price = economy class ticket price + "businessClassIncrement" (for example)
-            ticket.Price = basePrice + businessClassIncrement * temp;
-            return ticket;
-        }
-
-        Passenger[] CreateRandomPassengers(int maxNumberOfPassengers, int numberOfPassengers, int flightNumber, decimal economyClassPrice)
-        {
-            Passenger[] passengers = new Passenger[maxNumberOfPassengers];
-            string[] firstNamesMale = { "John", "Quentin", "Brad", "Cristiano", "Lionel", "Vladimir", "Petro", "Barak" };
-            string[] lastNamesMale = { "Travolta", "Tarantino", "Pitt", "Ronaldo", "Messi", "Putin", "Poroshenko", "Obama" };
-            string[] firstNamesFemale = { "Angelina", "Jessica", "Angela", "Paris", "Mary", "Yuliya", "Hillary" };
-            string[] lastNamesFemale = { "Jolie", "Alba", "Merkel", "Hilton", "Poppins", "Timoshenko", "Clinton" };
-            string[] nationalities = { "American", "German", "Russian", "Brazilian", "Mexican", "Indian" };
-
-            string firstName;
-            string lastName;
-            string nationality;
-            string passport;
-            DateTime birthday;
-            Sex sex = Sex.Male;
-            FlightTicket ticket;
-
-            numberOfPassengers = numberOfPassengers > maxNumberOfPassengers ? maxNumberOfPassengers : numberOfPassengers;
-
-            int temp = random.Next(1, 6);
-
-            for (int i = 0; i < numberOfPassengers; i++)
-            {
-                temp = random.Next(2);
-                if (temp == 0)
-                {
-                    sex = Sex.Male;
-
-                    temp = random.Next(firstNamesMale.Length);
-                    firstName = firstNamesMale[temp];
-
-                    temp = random.Next(lastNamesMale.Length);
-                    lastName = lastNamesMale[temp];
-                }
-                else
-                {
-                    sex = Sex.Female;
-
-                    temp = random.Next(firstNamesFemale.Length);
-                    firstName = firstNamesFemale[temp];
-
-                    temp = random.Next(lastNamesFemale.Length);
-                    lastName = lastNamesFemale[temp];
-                }
-
-                temp = random.Next(nationalities.Length);
-                nationality = nationalities[temp];
-
-                passport = CreateRandomPassportNumber();
-
-                ticket = CreateRandomTicket(economyClassPrice);
-
-                temp = random.Next(int.MaxValue);
-                birthday = CreateRandomDate(1950, 1990);
-
-                passengers[i] = new Passenger(firstName, lastName, nationality, passport, birthday, sex, ticket, flightNumber);
-            }
-            return passengers;
-        }
-
-        void CreateSomeFlights(Airline airline)
-        {
-            FlightDirection direction = FlightDirection.Arrival;
-            DateTime time;
-            int number;
-            string destination;
-            AirportGate gate = AirportGate.A1;
-            FlightStatus status = FlightStatus.Arrived;
-            decimal economyClassPrice;
-            int numberOfPassengersToCreate, maxNumberOfPassengers;
-            Passenger[] passengers;
-
-            // Abu Dhabi
-            direction = FlightDirection.Arrival;
-            time = DateTime.Now.AddMinutes(100);
-            number = 0298;
-            destination = "Abu Dhabi";
-            gate = AirportGate.A3;
-            status = FlightStatus.InFlight;
-            economyClassPrice = 430;
-            maxNumberOfPassengers = 5;
-            numberOfPassengersToCreate = 5;
-            passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
-
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
-
-            // Helsinki
-            direction = FlightDirection.Arrival;
-            time = DateTime.Now.AddMinutes(200);
-            number = 3599;
-            destination = "Helsinki";
-            gate = AirportGate.C1;
-            status = FlightStatus.Unknown;
-            economyClassPrice = 370;
-            maxNumberOfPassengers = 15;
-            numberOfPassengersToCreate = 7;
-            passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
-
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
-
-            // Miami
-            direction = FlightDirection.Departure;
-            time = DateTime.Now.AddMinutes(40);
-            number = 1888;
-            destination = "Miami";
-            gate = AirportGate.A1;
-            status = FlightStatus.CheckIn;
-            economyClassPrice = 515;
-            maxNumberOfPassengers = 25;
-            numberOfPassengersToCreate = 4;
-            passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
-
-            // Sydney
-            direction = FlightDirection.Departure;
-            time = DateTime.Now.AddMinutes(5);
-            number = 0011;
-            destination = "Sydney";
-            gate = AirportGate.B1;
-            status = FlightStatus.GateClosed;
-            economyClassPrice = 925;
-            maxNumberOfPassengers = 15;
-            numberOfPassengersToCreate = 5;
-            passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
-
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
-
-            // Madrid
-            direction = FlightDirection.Arrival;
-            time = DateTime.Now.AddMinutes(30);
-            number = 3002;
-            destination = "Madrid";
-            gate = AirportGate.C2;
-            status = FlightStatus.Expected;
-            economyClassPrice = 260;
-            maxNumberOfPassengers = 10;
-            numberOfPassengersToCreate = 4;
-            passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
-
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
-        }
-
-        #endregion
 
         #region Output
-        
+
         // view the information of all the passengers in one table
-        void ViewAllPassengersInfo(Airline airline)
+        void ViewAllPassengersInfo()
         {
-            int maxProperPassengers = 1, index = 0;
-            Flight[] flights = airline.Flights;
-            Passenger[] allPassengers = new Passenger[maxProperPassengers];
-            Passenger[] tempPassengers = new Passenger[maxProperPassengers];
-
-            foreach (var flight in flights)
+            List<Passenger> allPassengers = new List<Passenger>();
+            foreach (var flight in _airline.Flights)
             {
-                if (flight != null && flight.Passengers != null)
+                foreach (var passenger in flight.Passengers)
                 {
-                    foreach (var passenger in flight.Passengers)
-                    {
-                        if (passenger != null)
-                        {
-                            if (index < maxProperPassengers)
-                            {
-                                allPassengers[index++] = passenger;
-                            }
-                            else
-                            {
-                                maxProperPassengers *= 2;
-                                tempPassengers = new Passenger[maxProperPassengers];
-                                Array.Copy(allPassengers, tempPassengers, allPassengers.Length);
-                                allPassengers = tempPassengers;
-
-                                allPassengers[index++] = passenger;
-                            }
-                        }
-                    }
+                    allPassengers.Add(passenger);
                 }
             }
-            _flightPrinter.PrintPassengersInfo(allPassengers);
+            _flightPrinter.Print(allPassengers);
         }
+
         // view the full information about the flights and the passengers
-        void ViewFlightPassengers(Flight[] flights)
+        void ViewFlightPassengers()
         {
             bool isOkParse, isFound, isCorrectNumber;
             int flightNumber;
-            Console.Write($"\n There are {flights.Count(o => o != null)} flights: ");
-            for (int i = 0; i < flights.Length; i++)
+            Console.Write($"\n There are {_airline.Flights.Count} flights: ");
+            foreach (Flight flight in _airline.Flights)
             {
-                if (flights[i] != null)
-                {
-                    Console.Write($"{flights[i].Number:d4}, ");
-                }
+                Console.Write($"{flight.Number:d4}, ");
             }
             Console.Write("\b\b.");
 
@@ -280,29 +69,26 @@ namespace AirlineManager
 
             if (flightNumber == 0)
             {
-                foreach (var flight in flights)
+                foreach (var flight in _airline.Flights)
                 {
-                    if (flight != null)
-                    {
-                        _flightPrinter.PrintFlightInfo(flight);
-                        _flightPrinter.PrintPassengersInfo(flight.Passengers);
-                        Console.WriteLine(" " + (new StringBuilder()).Append('-', Console.WindowWidth - 2));
-                    }
+                    _flightPrinter.Print(flight);
+                    _flightPrinter.Print(flight.Passengers);
+                    Console.WriteLine(" " + (new StringBuilder()).Append('-', Console.WindowWidth - 2));
                 }
             }
             else
             {
                 isFound = false;
-                foreach (Flight flight in flights)
+                foreach (Flight flight in _airline.Flights)
                 {
-                    if (flight != null && flight.Number == flightNumber)
+                    if (flight.Number == flightNumber)
                     {
                         isFound = true;
                         Console.WriteLine(" The flight has been found, press any key to show the information.");
                         Console.Write(' ');
                         Console.ReadKey();
-                        _flightPrinter.PrintFlightInfo(flight);
-                        _flightPrinter.PrintPassengersInfo(flight.Passengers);
+                        _flightPrinter.Print(flight);
+                        _flightPrinter.Print(flight.Passengers);
                         break;
                     }
                 }
@@ -317,16 +103,21 @@ namespace AirlineManager
 
         #region Flight and passenger search
 
-        void FindPassengersByName(Flight[] flights)
+        void FindPassengers()
         {
-            int maxProperPassengers = 2;
-            Passenger[] properPassengers = new Passenger[maxProperPassengers];
-            Passenger[] tempPassengers = new Passenger[maxProperPassengers];
+            List<Passenger> properPassengers = new List<Passenger>();
+            List<Flight> flights = _airline.Flights;
 
             ConsoleKey keyPressed;
-            string fullName, nameToSeek;
+            string fullName, nameToSeek, passportNumberToSeek;
             bool isFirstMatch, isFound;
-            int index;
+
+            Console.WriteLine(" Find passengers by");
+            Console.WriteLine(" 1 - name");
+            Console.WriteLine(" 2 - passport number");
+            Console.Write(" ");
+
+
 
             do
             {
@@ -341,37 +132,21 @@ namespace AirlineManager
                 {
                     isFirstMatch = true;
                     isFound = false;
-                    index = 0;
                     foreach (var flight in flights)
                     {
-                        if (flight != null && flight.Passengers != null)
+                        if (flight.Passengers != null)
                         {
                             foreach (var passenger in flight.Passengers)
                             {
-                                if (passenger != null)
+                                fullName = $"{passenger.FirstName} {passenger.LastName}";
+                                if (fullName.ToUpper().Contains(nameToSeek))
                                 {
-                                    fullName = $"{passenger.FirstName} {passenger.LastName}";
-                                    if (fullName.ToUpper().Contains(nameToSeek))
+                                    if (isFirstMatch)
                                     {
-                                        if (index < maxProperPassengers)
-                                        {
-                                            if (isFirstMatch)
-                                            {
-                                                isFirstMatch = false;
-                                                isFound = true;
-                                            }
-                                            properPassengers[index++] = passenger;
-                                        }
-                                        else
-                                        {
-                                            maxProperPassengers *= 2;
-                                            tempPassengers = new Passenger[maxProperPassengers];
-                                            Array.Copy(properPassengers, tempPassengers, properPassengers.Length);
-                                            properPassengers = tempPassengers;
-
-                                            properPassengers[index++] = passenger;
-                                        }
+                                        isFirstMatch = false;
+                                        isFound = true;
                                     }
+                                    properPassengers.Add(passenger);
                                 }
                             }
                         }
@@ -379,9 +154,7 @@ namespace AirlineManager
                 }
                 if (isFound)
                 {
-                    _flightPrinter.PrintPassengersInfo(properPassengers);
-                    Array.Clear(properPassengers, 0, properPassengers.Length);
-                    Array.Clear(tempPassengers, 0, tempPassengers.Length);
+                    _flightPrinter.Print(properPassengers);
                 }
                 else
                 {
@@ -397,15 +170,74 @@ namespace AirlineManager
             } while (keyPressed != ConsoleKey.Escape);
         }
 
-        void FindPassengersByPassportNumber(Flight[] flights)
+
+        void FindPassengersByName()
         {
-            int maxProperPassengers = 1;
-            Passenger[] properPassengers = new Passenger[maxProperPassengers];
-            Passenger[] tempPassengers = new Passenger[maxProperPassengers];
+            List<Passenger> properPassengers = new List<Passenger>();
+            List<Flight> flights = _airline.Flights;
+
+            ConsoleKey keyPressed;
+            string fullName, nameToSeek;
+            bool isFirstMatch, isFound;
+
+            do
+            {
+                Console.WriteLine("\n Enter a name to seek:");
+                Console.Write(" ");
+                nameToSeek = Console.ReadLine().Trim().ToUpper();
+                if (nameToSeek == "")
+                {
+                    isFound = false;
+                }
+                else
+                {
+                    isFirstMatch = true;
+                    isFound = false;
+                    foreach (var flight in flights)
+                    {
+                        if (flight.Passengers != null)
+                        {
+                            foreach (var passenger in flight.Passengers)
+                            {
+                                fullName = $"{passenger.FirstName} {passenger.LastName}";
+                                if (fullName.ToUpper().Contains(nameToSeek))
+                                {
+                                    if (isFirstMatch)
+                                    {
+                                        isFirstMatch = false;
+                                        isFound = true;
+                                    }
+                                    properPassengers.Add(passenger);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (isFound)
+                {
+                    _flightPrinter.Print(properPassengers);
+                }
+                else
+                {
+                    Console.WriteLine(" No matches have been found.");
+                }
+                Console.WriteLine("\n Press ESC to quit or any other key to search again.");
+                Console.Write(" ");
+                keyPressed = Console.ReadKey().Key;
+                if (keyPressed != ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                }
+            } while (keyPressed != ConsoleKey.Escape);
+        }
+
+        void FindPassengersByPassportNumber()
+        {
+            List<Flight> flights = _airline.Flights;
+            List<Passenger> properPassengers = new List<Passenger>();
 
             ConsoleKey keyPressed;
             string passportNumberToSeek;
-            int index;
             bool isFirstMatch, isFound;
 
             do
@@ -421,33 +253,20 @@ namespace AirlineManager
                 {
                     isFound = false;
                     isFirstMatch = true;
-                    index = 0;
                     foreach (var flight in flights)
                     {
-                        if (flight != null && flight.Passengers != null)
+                        if (flight.Passengers != null)
                         {
                             foreach (var passenger in flight.Passengers)
                             {
-                                if (passenger != null && passenger.Passport.Contains(passportNumberToSeek))
+                                if (passenger.Passport.Contains(passportNumberToSeek))
                                 {
-                                    if (index < maxProperPassengers)
+                                    if (isFirstMatch)
                                     {
-                                        if (isFirstMatch)
-                                        {
-                                            isFirstMatch = false;
-                                            isFound = true;
-                                        }
-                                        properPassengers[index++] = passenger;
+                                        isFirstMatch = false;
+                                        isFound = true;
                                     }
-                                    else
-                                    {
-                                        maxProperPassengers *= 2;
-                                        tempPassengers = new Passenger[maxProperPassengers];
-                                        Array.Copy(properPassengers, tempPassengers, properPassengers.Length);
-                                        properPassengers = tempPassengers;
-
-                                        properPassengers[index++] = passenger;
-                                    }
+                                    properPassengers.Add(passenger);
                                 }
                             }
                         }
@@ -455,9 +274,7 @@ namespace AirlineManager
                 }
                 if (isFound)
                 {
-                    _flightPrinter.PrintPassengersInfo(properPassengers);
-                    Array.Clear(properPassengers, 0, properPassengers.Length);
-                    Array.Clear(tempPassengers, 0, tempPassengers.Length);
+                    _flightPrinter.Print(properPassengers);
                 }
                 else
                 {
@@ -473,12 +290,13 @@ namespace AirlineManager
             } while (keyPressed != ConsoleKey.Escape);
         }
 
-        void FindFlightsByEconomyClassPrice(Flight[] flights)
+        void FindFlightsByEconomyClassPrice()
         {
-            Flight[] properFlights = new Flight[flights.Length];
+            List<Flight> flights = _airline.Flights;
+            List<Flight> properFlights = new List<Flight>();
+
             ConsoleKey keyPressed;
             decimal upperPrice;
-            int index;
             bool isFirstMatch, isFound, isValidInput;
 
             do
@@ -496,22 +314,17 @@ namespace AirlineManager
 
                 isFirstMatch = true;
                 isFound = false;
-                index = 0;
 
                 foreach (var flight in flights)
                 {
-                    if (flight != null)
+                    if (flight.EconomyClassPrice <= upperPrice)
                     {
-                        if (flight.EconomyClassPrice <= upperPrice)
+                        if (isFirstMatch)
                         {
-                            if (isFirstMatch)
-                            {
-                                isFound = true;
-                                isFirstMatch = false;
-                            }
-                            properFlights[index] = flight;
-                            index++;
+                            isFound = true;
+                            isFirstMatch = false;
                         }
+                        properFlights.Add(flight);
                     }
                 }
 
@@ -520,8 +333,7 @@ namespace AirlineManager
                     Console.Write(" Some flights've been found. Press any key to show the information. ");
                     Console.ReadKey();
                     Console.WriteLine();
-                    _flightPrinter.PrintFlightsInfo(properFlights);
-                    Array.Clear(properFlights, 0, properFlights.Length);
+                    _flightPrinter.Print(properFlights);
                 }
                 else
                 {
@@ -554,9 +366,9 @@ namespace AirlineManager
             return null;
         }
 
-        void AddFlight(Airline airline)
+        void AddFlight()
         {
-            Flight[] flights = airline.Flights;
+            List<Flight> flights = _airline.Flights;
             FlightDirection direction = FlightDirection.Arrival;
             DateTime time;
             int number;
@@ -565,12 +377,13 @@ namespace AirlineManager
             FlightStatus status = FlightStatus.Arrived;
             decimal economyClassPrice;
             int numberOfPassengers, maxNumberOfPassengers;
-            Passenger[] passengers;
+            List<Passenger> passengers;
+            AirlineFactory airlineFactory = new AirlineFactory();
 
             bool isOkParse, isProperOption, isFreeFlightNumber, isOkInput;
             int tempInt;
             string tempString;
-            if (airline.IsFull())
+            if (_airline.IsFull())
             {
                 Console.WriteLine("\n The maximum number of flights is reached. Remove some to add another one.");
             }
@@ -730,7 +543,7 @@ namespace AirlineManager
                     }
                 } while (!isOkParse || !isProperPrice);
                 Console.WriteLine($" The economy ticket price \"{economyClassPrice}\" has been saved.");
-                
+
                 #endregion
 
                 #region Gate
@@ -878,18 +691,18 @@ namespace AirlineManager
                         }
                     } while (!isOkParse || !isOkInput);
 
-                    passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengers, number, economyClassPrice);
+                    passengers = airlineFactory.CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengers, number, economyClassPrice);
                     Console.WriteLine($" {numberOfPassengers} random passenger has been created.");
                 }
                 else
                 {
                     int index = 0;
                     bool isFull, isEnough;
-                    passengers = new Passenger[maxNumberOfPassengers];
+                    passengers = new List<Passenger>(maxNumberOfPassengers);
                     do
                     {
                         isFull = isEnough = false;
-                        passengers[index++] = CreateNewPassenger(number, economyClassPrice);
+                        passengers.Add(CreateNewPassenger(number, economyClassPrice));
                         if (index < maxNumberOfPassengers)
                         {
                             Console.WriteLine("\n Press ENTER to add new passenger or any other key to stop adding.");
@@ -913,14 +726,14 @@ namespace AirlineManager
 
                 #endregion
 
-                airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
+                _airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
                 Console.WriteLine("\n The flight has been successfully added.");
             }
         }
 
-        void EditFlight(Airline airline)
+        void EditFlight()
         {
-            Flight[] flights = airline.Flights;
+            List<Flight> flights = _airline.Flights;
 
             FlightDirection direction = FlightDirection.Arrival;
             DateTime time;
@@ -934,16 +747,13 @@ namespace AirlineManager
             int tempInt;
 
             int flightNumber;
-            int[] flightNumbers = new int[flights.Length];
+            List<int> flightNumbers = new List<int>();
 
             Console.Write($"\n There are {flights.Count(o => o != null)} flights: ");
-            for (int i = 0; i < flights.Length; i++)
+            foreach (var flight in flights)
             {
-                if (flights[i] != null)
-                {
-                    flightNumbers[i] = flights[i].Number;
-                    Console.Write($"{flights[i].Number:d4}, ");
-                }
+                flightNumbers.Add(flight.Number);
+                Console.Write($"{flight.Number:d4}, ");
             }
             Console.Write("\b\b.");
 
@@ -968,7 +778,7 @@ namespace AirlineManager
             Console.Write(" ");
             if (Console.ReadKey().Key == ConsoleKey.Enter)
             {
-                Flight currentFlight = GetFlightByNumber(flights, flightNumber);
+                Flight currentFlight = flights.Find(x => x.Number == flightNumber);
 
                 #region Direction
 
@@ -1152,7 +962,7 @@ namespace AirlineManager
                     }
                 } while (!isOkParse || !isProperPrice);
                 Console.WriteLine($" The economy ticket price \"{economyClassPrice}\" has been saved.");
-                
+
                 #endregion
 
                 #region Gate
@@ -1250,34 +1060,30 @@ namespace AirlineManager
 
                 #endregion
 
-                airline.RemoveFlight(currentFlight);
-                airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice,
+                _airline.RemoveFlight(currentFlight);
+                _airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice,
                                   currentFlight.MaxNumberOfPassengers, currentFlight.Passengers));
                 Console.WriteLine("\n The flight info has been successfully updated.");
             }
         }
 
-        void RemoveFlight(Airline airline)
+        void RemoveFlight()
         {
-            Flight[] flights = airline.Flights;
-
-            int[] flightNumbers = new int[flights.Length];
+            List<Flight> flights = _airline.Flights;
+            List<int> flightNumbers = new List<int>();
             bool isOkParse, isCorrectNumber;
             int flightNumber;
 
-            if (airline.NumberOfFlights == 0)
+            if (flights.Count == 0)
             {
                 Console.WriteLine("\n There are no flights to remove.");
             }
             else {
-                Console.Write($"\n There are {airline.NumberOfFlights} flights: ");
-                for (int i = 0; i < flights.Length; i++)
+                Console.Write($"\n There are {flights.Count} flights: ");
+                foreach (Flight flight in flights)
                 {
-                    if (flights[i] != null)
-                    {
-                        flightNumbers[i] = flights[i].Number;
-                        Console.Write($"{flights[i].Number:d4}, ");
-                    }
+                    flightNumbers.Add(flight.Number);
+                    Console.Write($"{flight.Number:d4}, ");
                 }
                 Console.Write("\b\b.");
                 Console.WriteLine("\n Enter the number of the flight to remove:");
@@ -1302,18 +1108,18 @@ namespace AirlineManager
                     Console.WriteLine(" The flight has been found. Press any key to show the flight's info.");
                     Console.ReadKey();
                     int i;
-                    for (i = 0; i < flights.Length; i++)
+                    for (i = 0; i < flights.Count; i++)
                     {
                         if (flights[i] != null && flights[i].Number == flightNumber)
                         {
-                            _flightPrinter.PrintFlightInfo(flights[i]);
-                            _flightPrinter.PrintPassengersInfo(flights[i].Passengers);
+                            _flightPrinter.Print(flights[i]);
+                            _flightPrinter.Print(flights[i].Passengers);
                             break;
                         }
                     }
                     Console.WriteLine("\n Press any key to remove the flight.");
                     Console.ReadKey();
-                    airline.RemoveFlight(flights[i]);
+                    _airline.RemoveFlight(flights[i]);
                     Console.WriteLine("\n The flight has been removed.");
                 }
                 else
@@ -1327,20 +1133,19 @@ namespace AirlineManager
 
         #region Add, remove, edit passenger
 
-        Passenger GetPassengerByPassportNumber(Flight[] flights, string passportNumber)
+        Passenger GetPassengerByPassportNumber(string passportNumber)
         {
+            List<Flight> flights = _airline.Flights;
+
             foreach (Flight flight in flights)
             {
-                if (flight != null)
-                {
                     foreach (Passenger passenger in flight.Passengers)
                     {
-                        if (passenger != null && passenger.Passport.Equals(passportNumber))
+                        if (passenger.Passport.Equals(passportNumber))
                         {
                             return passenger;
                         }
                     }
-                }
             }
             return null;
         }
@@ -1563,27 +1368,31 @@ namespace AirlineManager
             Console.WriteLine($" The ticket class \"{ticketClass}\" has been saved.");
             #endregion
 
+
+            decimal businessClassIncrement;
+            if (!decimal.TryParse(ConfigurationManager.AppSettings["businessClassIncrement"], out businessClassIncrement))
+            {
+                businessClassIncrement = 200;
+            }
+
             ticketPrice = ecTicketPrice + businessClassIncrement * (int)ticketClass;
-            ticket = new FlightTicket { Class = ticketClass, Price = ticketPrice };
+            ticket = new FlightTicket { Class = ticketClass, Price = ticketPrice, FlightNumber = flightNumber };
 
             return new Passenger(firstName, lastName, nationality, passport, birthday, sex,
-                                                               ticket, flightNumber);
+                                                               ticket);
         }
 
-        void AddPassenger(Airline airline)
+        void AddPassenger()
         {
             bool isOkParse, isCorrectNumber, isFound;
-            Flight[] flights = airline.Flights;
+            List<Flight> flights = _airline.Flights;
             int flightNumber;
             string fullOrNot;
-            Console.Write($"\n There are {airline.NumberOfFlights} flights: ");
-            for (int i = 0; i < flights.Length; i++)
+            Console.Write($"\n There are {flights.Count} flights: ");
+            foreach (var flight in flights)
             {
-                if (flights[i] != null)
-                {
-                    fullOrNot = (flights[i].IsFull()) ? " (full)" : "";
-                    Console.Write($"{flights[i].Number:d4}{fullOrNot}, ");
-                }
+                fullOrNot = (flight.IsFull()) ? " (full)" : "";
+                Console.Write($"{flight.Number:d4}{fullOrNot}, ");
             }
             Console.Write("\b\b.");
 
@@ -1613,8 +1422,8 @@ namespace AirlineManager
                     Console.WriteLine(" The flight has been found, press any key to show the information.");
                     Console.Write(' ');
                     Console.ReadKey();
-                    _flightPrinter.PrintFlightInfo(flight);
-                    _flightPrinter.PrintPassengersInfo(flight.Passengers);
+                    _flightPrinter.Print(flight);
+                    _flightPrinter.Print(flight.Passengers);
                     if (flight.IsFull())
                     {
                         Console.WriteLine("\n The flight is full. Remove some passengers to add another one.");
@@ -1625,7 +1434,7 @@ namespace AirlineManager
                         do
                         {
                             isFull = isEnough = false;
-                            airline.AddPassenger(CreateNewPassenger(flightNumber, flight.EconomyClassPrice), flightNumber);
+                            _airline.AddPassenger(CreateNewPassenger(flightNumber, flight.EconomyClassPrice), flightNumber);
                             index++;
                             Console.WriteLine("\n The passenger has been successfully added to the flight.");
 
@@ -1655,7 +1464,7 @@ namespace AirlineManager
             }
         }
 
-        void EditPassenger(Airline airline)
+        void EditPassenger()
         {
             string firstName;
             string lastName;
@@ -1673,7 +1482,7 @@ namespace AirlineManager
             Flight flightOfThePassenger = null;
 
             Console.WriteLine("\n All the passengers: \n");
-            ViewAllPassengersInfo(airline);
+            ViewAllPassengersInfo();
 
             Console.WriteLine("\n Enter the passport number of the passenger you want to edit:");
             do
@@ -1690,7 +1499,7 @@ namespace AirlineManager
             } while (!isCorrectNumber);
             // search for a passenger by the passport number
             isFound = false;
-            foreach (Flight flight in airline.Flights)
+            foreach (Flight flight in _airline.Flights)
             {
                 if (flight != null)
                 {
@@ -1904,34 +1713,39 @@ namespace AirlineManager
                 Console.WriteLine($" The ticket class \"{ticketClass}\" has been saved.");
                 #endregion
 
+                decimal businessClassIncrement;
+                if (!decimal.TryParse(ConfigurationManager.AppSettings["businessClassIncrement"], out businessClassIncrement))
+                {
+                    businessClassIncrement = 200;
+                }
                 ticketPrice = flightOfThePassenger.EconomyClassPrice + businessClassIncrement * (int)ticketClass;
-                ticket = new FlightTicket { Class = ticketClass, Price = ticketPrice };
+                ticket = new FlightTicket { Class = ticketClass, Price = ticketPrice, FlightNumber = flightOfThePassenger.Number };
 
-                airline.RemovePassenger(passengerToEdit);
-                airline.AddPassenger(new Passenger(firstName, lastName, nationality, passport, birthday, sex,
-                                                   ticket, flightOfThePassenger.Number), flightOfThePassenger.Number);
+                _airline.RemovePassenger(passengerToEdit);
+                _airline.AddPassenger(new Passenger(firstName, lastName, nationality, passport, birthday, sex,
+                                                   ticket), flightOfThePassenger.Number);
 
                 Console.WriteLine("\n\n The passenger's info has been successfully updated.");
             }
         }
 
-        void RemovePassenger(Airline airline)
+        void RemovePassenger()
         {
             Passenger passengerToRemove;
             string passportNumber;
             Console.WriteLine();
-            ViewAllPassengersInfo(airline);
+            ViewAllPassengersInfo();
             do
             {
                 Console.WriteLine("\n Enter the passport number of the passenger to remove:");
                 Console.Write(' ');
                 passportNumber = Console.ReadLine().Trim().ToUpper();
-                passengerToRemove = GetPassengerByPassportNumber(airline.Flights, passportNumber);
+                passengerToRemove = GetPassengerByPassportNumber(passportNumber);
                 if (passengerToRemove != null)
                 {
                     Console.WriteLine(" The passenger has been found. Press any key to remove him/her.");
                     Console.ReadKey();
-                    airline.RemovePassenger(passengerToRemove);
+                    _airline.RemovePassenger(passengerToRemove);
                     Console.WriteLine("\n The passenger has been successfully removed.");
                 }
                 else
@@ -1949,9 +1763,20 @@ namespace AirlineManager
 
         void ShowMenuHeader(string menuTitle)
         {
+            int windowWidth = 100;
+
+            try
+            {
+                windowWidth = int.Parse(ConfigurationManager.AppSettings["WindowWidth"]);
+            }
+            catch
+            {
+                Console.WriteLine("An error occurred while reading from .config. Check the file up.");
+            }
+
             int numberOfSpaces = 3;
-            int starsLengthLeft = (WindowWidth - 2 - menuTitle.Length - 2 * numberOfSpaces) / 2;
-            int starsLengthRight = WindowWidth - 2 - menuTitle.Length - 2 * numberOfSpaces - starsLengthLeft;
+            int starsLengthLeft = (windowWidth - 2 - menuTitle.Length - 2 * numberOfSpaces) / 2;
+            int starsLengthRight = windowWidth - 2 - menuTitle.Length - 2 * numberOfSpaces - starsLengthLeft;
             StringBuilder menuHeader = new StringBuilder();
             menuHeader.Append(' ');
             menuHeader.Append('*', starsLengthLeft);
@@ -1991,7 +1816,7 @@ namespace AirlineManager
 
         #region Management 
 
-        void Operate(Airline airline)
+        void Operate()
         {
             bool isOkParse, isProperOption;
             byte option;
@@ -2007,47 +1832,47 @@ namespace AirlineManager
                     {
                         case 1:
                             ShowMenuHeader("view all the flights");
-                            _flightPrinter.PrintFlightsInfo(airline.Flights);
+                            _flightPrinter.Print(_airline.Flights);
                             break;
                         case 2:
                             ShowMenuHeader("view the passengers of a flight");
-                            ViewFlightPassengers(airline.Flights);
+                            ViewFlightPassengers();
                             break;
                         case 3:
                             ShowMenuHeader("find passengers by name");
-                            FindPassengersByName(airline.Flights);
+                            FindPassengersByName();
                             break;
                         case 4:
                             ShowMenuHeader("find passengers by passport number");
-                            FindPassengersByPassportNumber(airline.Flights);
+                            FindPassengersByPassportNumber();
                             break;
                         case 5:
                             ShowMenuHeader("find flights by the economy class price");
-                            FindFlightsByEconomyClassPrice(airline.Flights);
+                            FindFlightsByEconomyClassPrice();
                             break;
                         case 6:
                             ShowMenuHeader("add a flight");
-                            AddFlight(airline);
+                            AddFlight();
                             break;
                         case 7:
                             ShowMenuHeader("edit a flight");
-                            EditFlight(airline);
+                            EditFlight();
                             break;
                         case 8:
                             ShowMenuHeader("remove a flight");
-                            RemoveFlight(airline);
+                            RemoveFlight();
                             break;
                         case 9:
                             ShowMenuHeader("add a passenger");
-                            AddPassenger(airline);
+                            AddPassenger();
                             break;
                         case 10:
                             ShowMenuHeader("edit a passenger");
-                            EditPassenger(airline);
+                            EditPassenger();
                             break;
                         case 11:
                             ShowMenuHeader("remove a passenger");
-                            RemovePassenger(airline);
+                            RemovePassenger();
                             break;
                         case 0:
                             break;
@@ -2064,17 +1889,28 @@ namespace AirlineManager
             } while (!isOkParse || !isProperOption);
         }
 
-        public void Manage(Airline airline)
+        public void Manage()
         {
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(Culture);
-            Console.WindowHeight = WindowHeight;
-            Console.WindowWidth = Console.BufferWidth = WindowWidth;
-            CreateSomeFlights(airline);
+            try
+            {
+                string culture = ConfigurationManager.AppSettings["Culture"];
+                int windowHeight = int.Parse(ConfigurationManager.AppSettings["WindowHeight"]);
+                int windowWidth = int.Parse(ConfigurationManager.AppSettings["WindowWidth"]);
+
+                CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(culture);
+                Console.WindowHeight = windowHeight;
+                Console.WindowWidth = Console.BufferWidth = windowWidth;
+            }
+            catch
+            {
+                Console.WriteLine("An error occurred while reading from .config. Check the file up.");
+            }
+
             do
             {
                 Console.Clear();
                 ShowMainMenu();
-                Operate(airline);
+                Operate();
                 Console.WriteLine("\n Press ESC to quit or any other key to go back to main menu.");
                 Console.Write(" ");
             } while (Console.ReadKey().Key != ConsoleKey.Escape);

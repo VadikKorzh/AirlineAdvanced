@@ -1,46 +1,15 @@
-﻿using System;
+﻿using KRZHK.AirlineLibrary.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AirlineLibrary
+namespace KRZHK.AirlineLibrary
 {
-    public enum FlightDirection
-    {
-        Arrival,
-        Departure
-    }
-
-    public enum AirportGate
-    {
-        A1,
-        A2,
-        A3,
-        B1,
-        B2,
-        C1,
-        C2
-    }
-
-    public enum FlightStatus
-    {
-        CheckIn,
-        GateClosed,
-        Arrived,
-        Departed,
-        Canceled,
-        Expected,
-        Delayed,
-        Unknown,
-        InFlight
-    }
-
     public class Flight
     {
-        Passenger[] _passengers;
         public readonly int MaxNumberOfPassengers = 20;
-        int _numberOfPassengers = 0;
 
         public FlightDirection Direction { get; private set; }
         public DateTime Time { get; private set; }
@@ -49,26 +18,15 @@ namespace AirlineLibrary
         public AirportGate Gate { get; private set; }
         public FlightStatus Status { get; private set; }
         public decimal EconomyClassPrice { get; private set; }
-        public Passenger[] Passengers
-        {
-            get
-            {
-                return ClonePassengers();
-            }
-            private set
-            {
-                _passengers = value;
-            }
-        }
 
-        public int NumberOfPassengers { get { return _numberOfPassengers; } }
+        public List<Passenger> Passengers { get; private set; }
+
+        public int NumberOfPassengers { get { return Passengers.Count; } }
 
         #region Constructors
 
-        public Flight() { }
-
         public Flight(FlightDirection direction, DateTime time, int number, string destination, AirportGate gate,
-                       FlightStatus status, decimal economyClassPrice, int maxNumberOfPassengers, Passenger[] passengers)
+                       FlightStatus status, decimal economyClassPrice, int maxNumberOfPassengers, IEnumerable<Passenger> passengers)
         {
             Direction = direction;
             Time = time;
@@ -78,13 +36,10 @@ namespace AirlineLibrary
             Status = status;
             EconomyClassPrice = economyClassPrice;
             MaxNumberOfPassengers = maxNumberOfPassengers;
-            Passengers = new Passenger[maxNumberOfPassengers];
+            Passengers = new List<Passenger>(maxNumberOfPassengers);
             foreach (var passenger in passengers)
             {
-                if (passenger != null)
-                {
-                    AddPassenger(passenger);
-                }
+                AddPassenger(passenger);
             }
         }
 
@@ -93,54 +48,37 @@ namespace AirlineLibrary
         public override string ToString()
         {
             StringBuilder resultString = new StringBuilder();
-            resultString.Append($" Direction: {Direction}\n");
-            resultString.Append($" Flight time: {Time:g}\n");
-            resultString.Append($" Flight number: {Number:d4}\n");
-            resultString.Append($" Destination: {Destination}\n");
-            resultString.Append($" Gate: {Gate}\n");
-            resultString.Append($" Flight status: {Status}\n");
-            resultString.Append($" Passengers: {Passengers.Count(o => o != null)}\n\n");
-            foreach (var passenger in Passengers)
-            {
-                resultString.Append($"{passenger}\n");
-            }
+            resultString.Append($"[ Direction: {Direction},");
+            resultString.Append($" Flight time: {Time:g},");
+            resultString.Append($" Flight number: {Number:d4},");
+            resultString.Append($" Destination: {Destination},");
+            resultString.Append($" Gate: {Gate},");
+            resultString.Append($" Flight status: {Status},");
+            resultString.Append($" Passengers: {Passengers.Count} ]");
             return resultString.ToString();
         }
 
         public bool IsFull()
         {
-            return _numberOfPassengers == MaxNumberOfPassengers;
+            return Passengers.Count == MaxNumberOfPassengers;
         }
 
-        public Flight Clone()
-        {
-            return new Flight(Direction, Time, Number, Destination, Gate, Status, EconomyClassPrice, MaxNumberOfPassengers, Passengers);
-        }
-
-        Passenger[] ClonePassengers()
-        {
-            Passenger[] tempPassengers = new Passenger[_passengers.Length];
-
-            for (int i = 0; i < _passengers.Length; i++)
-            {
-                tempPassengers[i] = (_passengers[i] != null) ? _passengers[i].Clone() : null;
-            }
-
-            return tempPassengers;
-        }
+        //public Flight Clone()
+        //{
+        //    return new Flight(Direction, Time, Number, Destination, Gate, Status, EconomyClassPrice, MaxNumberOfPassengers, Passengers);
+        //}
 
         public void AddPassenger(Passenger passengerToAdd)
         {
             if (!IsFull())
             {
-                for (int i = 0; i < _passengers.Length; i++)
+                if (passengerToAdd.Ticket.FlightNumber == Number)
                 {
-                    if (_passengers[i] == null)
-                    {
-                        _passengers[i] = passengerToAdd.Clone();
-                        _numberOfPassengers++;
-                        break;
-                    }
+                    Passengers.Add(passengerToAdd);
+                }
+                else
+                {
+                    throw new ArgumentException("The passenger's ticket is not for this flight.");
                 }
             }
             else
@@ -151,13 +89,21 @@ namespace AirlineLibrary
 
         public void RemovePassenger(Passenger passengerToRemove)
         {
-            for (int i = 0; i < _passengers.Length; i++)
+            foreach (var passenger in Passengers)
             {
-                if (_passengers[i] != null && _passengers[i].Passport.Equals(passengerToRemove.Passport))
+                if (passenger.Passport.Equals(passengerToRemove.Passport))
                 {
-                    _passengers[i] = null;
-                    _numberOfPassengers--;
+                    Passengers.Remove(passengerToRemove);
                 }
+            }
+        }
+
+        // compares flights by time
+        public class FlightComparerByTime : IComparer<Flight>
+        {
+            public int Compare(Flight x, Flight y)
+            {
+                return x.Time.CompareTo(y.Time);
             }
         }
     }
