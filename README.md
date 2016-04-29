@@ -1,1 +1,1 @@
-# AirlineAdvanced by Vadik Korzh
+# AirlineGenerics by Vadik Korzh
