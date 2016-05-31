@@ -33,10 +33,9 @@ namespace KRZHK.AirlineManager
 
             logger.Info("Application started.");
 
-            Airline zachepilovkaAir = new Airline(7);
             AirlineFactory airlineFactory = new AirlineFactory();
-            airlineFactory.PopulateAirline(zachepilovkaAir);
-
+            Airline zachepilovkaAir = airlineFactory.CreateAndPopulateAirline(7);
+            
             IFlightPrinter flightPrinter = new ConsoleFlightPrinter();
             ConsoleAirlineManager zachepilovkaAirManager = new ConsoleAirlineManager(flightPrinter, zachepilovkaAir);
             zachepilovkaAirManager.Manage();

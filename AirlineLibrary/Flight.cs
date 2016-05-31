@@ -89,12 +89,22 @@ namespace KRZHK.AirlineLibrary
 
         public void RemovePassenger(Passenger passengerToRemove)
         {
-            foreach (var passenger in Passengers)
+            foreach (Passenger passenger in Passengers)
             {
                 if (passenger.Passport.Equals(passengerToRemove.Passport))
                 {
                     Passengers.Remove(passengerToRemove);
+                    return;
                 }
+            }
+        }
+
+        public void UpdatePassengers(int newFlightNumber)
+        {
+            foreach (Passenger passenger in Passengers)
+            {
+                passenger.Ticket = new FlightTicket { Class = passenger.Ticket.Class, Price = passenger.Ticket.Price,
+                                                      FlightNumber = newFlightNumber};
             }
         }
 

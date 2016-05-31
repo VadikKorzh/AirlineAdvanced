@@ -102,12 +102,12 @@ namespace KRZHK.AirlineLibrary
 
         public IEnumerator<Flight> GetEnumerator()
         {
-            return ((IEnumerable<Flight>)Flights).GetEnumerator();
+            return Flights.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<Flight>)Flights).GetEnumerator();
+            return Flights.GetEnumerator();
         }
     }
 }

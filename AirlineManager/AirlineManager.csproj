@@ -50,9 +50,12 @@
   <ItemGroup>
     <Compile Include="AirlineManagers\ConsoleAirlineManager.cs" />
     <Compile Include="AirlineManagers\IAirlineManager.cs" />
+    <Compile Include="FlightsManagers\ConsoleFlightsManager.cs" />
+    <Compile Include="FlightsManagers\FlightsManager.cs" />
+    <Compile Include="PassengersManagers\ConsolePassengersManager.cs" />
+    <Compile Include="PassengersManagers\PassengersManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Validators\Validator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -70,6 +73,7 @@
       <Name>AirlineLibrary</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

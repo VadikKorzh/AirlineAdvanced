@@ -1,5 +1,4 @@
-﻿using KRZHK.AirlineLibrary;
-using KRZHK.AirlineLibrary.Enums;
+﻿using KRZHK.AirlineLibrary.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -113,17 +112,26 @@ namespace KRZHK.AirlineLibrary
             return passengers;
         }
 
-        public void PopulateAirline(Airline airline)
+        public Airline CreateAndPopulateAirline(int numberOfFlights)
         {
-            FlightDirection direction = FlightDirection.Arrival;
+            Airline airline = new Airline(numberOfFlights);
+            PopulateAirline(airline);
+            return airline;
+        }
+
+        void PopulateAirline(Airline airline)
+        {
+            FlightDirection direction;
             DateTime time;
             int number;
             string destination;
-            AirportGate gate = AirportGate.A1;
-            FlightStatus status = FlightStatus.Arrived;
+            AirportGate gate;
+            FlightStatus status;
             decimal economyClassPrice;
             int numberOfPassengersToCreate, maxNumberOfPassengers;
             List<Passenger> passengers;
+
+            List<Flight> presetFlights = new List<Flight>();
 
             // Abu Dhabi
             direction = FlightDirection.Arrival;
@@ -137,7 +145,7 @@ namespace KRZHK.AirlineLibrary
             numberOfPassengersToCreate = 5;
             passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
 
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
+            presetFlights.Add(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
 
             // Helsinki
             direction = FlightDirection.Arrival;
@@ -151,7 +159,7 @@ namespace KRZHK.AirlineLibrary
             numberOfPassengersToCreate = 7;
             passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
 
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
+            presetFlights.Add(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
 
             // Miami
             direction = FlightDirection.Departure;
@@ -164,7 +172,8 @@ namespace KRZHK.AirlineLibrary
             maxNumberOfPassengers = 25;
             numberOfPassengersToCreate = 4;
             passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
+
+            presetFlights.Add(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
 
             // Sydney
             direction = FlightDirection.Departure;
@@ -178,7 +187,7 @@ namespace KRZHK.AirlineLibrary
             numberOfPassengersToCreate = 5;
             passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
 
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
+            presetFlights.Add(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
 
             // Madrid
             direction = FlightDirection.Arrival;
@@ -192,7 +201,17 @@ namespace KRZHK.AirlineLibrary
             numberOfPassengersToCreate = 4;
             passengers = CreateRandomPassengers(maxNumberOfPassengers, numberOfPassengersToCreate, number, economyClassPrice);
 
-            airline.AddFlight(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
+            presetFlights.Add(new Flight(direction, time, number, destination, gate, status, economyClassPrice, maxNumberOfPassengers, passengers));
+
+            foreach (Flight flight in presetFlights)
+            {
+                if (!airline.IsFull())
+                {
+                    airline.AddFlight(flight);
+                    continue;
+                }
+                break;
+            }
         }
     }
 }

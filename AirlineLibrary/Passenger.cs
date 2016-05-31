@@ -16,7 +16,7 @@ namespace KRZHK.AirlineLibrary
         public string Passport { get; private set; }
         public DateTime Birthday { get; private set; }
         public Sex Sex { get; private set; }
-        public FlightTicket Ticket { get; private set; }
+        public FlightTicket Ticket { get; set; }
         //public int FlightNumber { get; private set; }
 
         public Passenger(string firstName, string lastName, string nationality, string passport, DateTime birthday,

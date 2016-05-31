@@ -125,7 +125,7 @@ namespace KRZHK.AirlineLibrary.FlightPrinters
             }
         }
 
-        // display a single flight's info in a table
+        // displays a single flight's info in a table
         public void Print(Flight flight)
         {
             Console.WriteLine();
@@ -144,7 +144,7 @@ namespace KRZHK.AirlineLibrary.FlightPrinters
             Console.Write(GetPassengerTableFooter());
         }
 
-        // display a single passenger's info in a table
+        // displays a single passenger's info in a table
         public void Print(Passenger passenger)
         {
             Console.Write(GetPassengerTableHeader());
