@@ -3,15 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace KRZHK.AirlineManager.PassengersManagers
+namespace KRZHK.AirlineManager.PassengerManagers
 {
-    abstract class PassengersManager
+    abstract class PassengerManager
     {
         protected Airline _airline;
 
-        protected Passenger GetPassengerByPassportNumber(string passportNumber)
+        protected virtual Passenger GetPassengerByPassportNumber(string passportNumber)
         {
             List<Flight> flights = _airline.Flights;
             Passenger soughtforPassenger;
@@ -27,33 +28,10 @@ namespace KRZHK.AirlineManager.PassengersManagers
             return null;
         }
 
-        protected bool IsValidPassportNumber(string passportNumber)
+        protected virtual bool IsValidPassportNumber(string passportNumber)
         {
-            bool isValid = true;
-
-            if (passportNumber.Length != 9)
-            {
-                isValid = false;
-            }
-            else
-            {
-                for (int i = 0; i < passportNumber.Length && isValid; i++)
-                {
-                    if (i == 0 || i == 1)
-                    {
-                        isValid = Char.IsLetter(passportNumber[i]);
-                    }
-                    else if (i == 2)
-                    {
-                        isValid = (passportNumber[i] == ' ');
-                    }
-                    else
-                    {
-                        isValid = Char.IsDigit(passportNumber[i]);
-                    }
-                }
-            }
-            return isValid;
+            Regex passportRegex = new Regex(@"^\w{2}\s\d{6}$");
+            return passportRegex.Match(passportNumber).Success;
         }
 
         abstract public Passenger CreateNewPassenger(int flightNumber, decimal ecTicketPrice);

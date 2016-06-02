@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using KRZHK.AirlineLibrary;
 using KRZHK.AirlineLibrary.Enums;
 using KRZHK.AirlineLibrary.FlightPrinters;
-using KRZHK.AirlineManager.FlightsManagers;
-using KRZHK.AirlineManager.PassengersManagers;
+using KRZHK.AirlineManager.FlightManagers;
+using KRZHK.AirlineManager.PassengerManagers;
 
 namespace KRZHK.AirlineManager.AirlineManagers
 {
@@ -18,15 +18,15 @@ namespace KRZHK.AirlineManager.AirlineManagers
     {
         IFlightPrinter _flightPrinter;
         Airline _airline;
-        FlightsManager _flightsManager;
-        PassengersManager _passengersManager;
+        FlightManager _flightsManager;
+        PassengerManager _passengersManager;
 
         public ConsoleAirlineManager(IFlightPrinter printer, Airline airline)
         {
             _flightPrinter = printer;
             _airline = airline;
-            _flightsManager = new ConsoleFlightsManager(airline, printer);
-            _passengersManager = new ConsolePassengersManager(airline, printer);
+            _flightsManager = new ConsoleFlightManager(airline, printer);
+            _passengersManager = new ConsolePassengerManager(airline, printer);
         }
         
         #region Form menus

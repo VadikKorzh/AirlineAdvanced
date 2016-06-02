@@ -1,24 +1,24 @@
 ﻿using KRZHK.AirlineLibrary;
 using KRZHK.AirlineLibrary.Enums;
 using KRZHK.AirlineLibrary.FlightPrinters;
-using KRZHK.AirlineManager.PassengersManagers;
+using KRZHK.AirlineManager.PassengerManagers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KRZHK.AirlineManager.FlightsManagers
+namespace KRZHK.AirlineManager.FlightManagers
 {
-    class ConsoleFlightsManager : FlightsManager
+    class ConsoleFlightManager : FlightManager
     {
         IFlightPrinter _flightPrinter;
 
-        public ConsoleFlightsManager(Airline airline, IFlightPrinter printer)
+        public ConsoleFlightManager(Airline airline, IFlightPrinter printer)
         {
             _airline = airline;
             _flightPrinter = printer;
-            _passengersManager = new ConsolePassengersManager(airline, printer);
+            _passengersManager = new ConsolePassengerManager(airline, printer);
         }
 
         #region Add, remove, edit flight
@@ -360,7 +360,7 @@ namespace KRZHK.AirlineManager.FlightsManagers
                     {
                         isFull = isEnough = false;
                         passengers.Add(_passengersManager.CreateNewPassenger(number, economyClassPrice));
-                        if (index < maxNumberOfPassengers)
+                        if (++index < maxNumberOfPassengers)
                         {
                             Console.WriteLine("\n Press ENTER to add new passenger or any other key to stop adding.");
                             Console.Write(" ");

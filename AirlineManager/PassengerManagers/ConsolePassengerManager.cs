@@ -8,13 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KRZHK.AirlineManager.PassengersManagers
+namespace KRZHK.AirlineManager.PassengerManagers
 {
-    class ConsolePassengersManager : PassengersManager
+    class ConsolePassengerManager : PassengerManager
     {
         IFlightPrinter _flightPrinter;
 
-        public ConsolePassengersManager(Airline airline, IFlightPrinter printer)
+        public ConsolePassengerManager(Airline airline, IFlightPrinter printer)
         {
             _airline = airline;
             _flightPrinter = printer;
@@ -100,71 +100,6 @@ namespace KRZHK.AirlineManager.PassengersManagers
         #endregion
 
         #region Passenger search
-
-        //public void FindPassengers()
-        //{
-        //    List<Passenger> properPassengers = new List<Passenger>();
-        //    List<Flight> flights = _airline.Flights;
-
-        //    ConsoleKey keyPressed;
-        //    string fullName, nameToSeek;
-        //    bool isFirstMatch, isFound;
-
-        //    Console.WriteLine(" Find passengers by");
-        //    Console.WriteLine(" 1 - name");
-        //    Console.WriteLine(" 2 - passport number");
-        //    Console.Write(" ");
-
-        //    do
-        //    {
-        //        Console.WriteLine("\n Enter a name to seek:");
-        //        Console.Write(" ");
-        //        nameToSeek = Console.ReadLine().Trim().ToUpper();
-        //        if (nameToSeek == "")
-        //        {
-        //            isFound = false;
-        //        }
-        //        else
-        //        {
-        //            isFirstMatch = true;
-        //            isFound = false;
-        //            foreach (var flight in flights)
-        //            {
-        //                if (flight.Passengers != null)
-        //                {
-        //                    foreach (var passenger in flight.Passengers)
-        //                    {
-        //                        fullName = $"{passenger.FirstName} {passenger.LastName}";
-        //                        if (fullName.ToUpper().Contains(nameToSeek))
-        //                        {
-        //                            if (isFirstMatch)
-        //                            {
-        //                                isFirstMatch = false;
-        //                                isFound = true;
-        //                            }
-        //                            properPassengers.Add(passenger);
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        if (isFound)
-        //        {
-        //            _flightPrinter.Print(properPassengers);
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine(" No matches have been found.");
-        //        }
-        //        Console.WriteLine("\n Press ESC to quit or any other key to search again.");
-        //        Console.Write(" ");
-        //        keyPressed = Console.ReadKey().Key;
-        //        if (keyPressed != ConsoleKey.Enter)
-        //        {
-        //            Console.WriteLine();
-        //        }
-        //    } while (keyPressed != ConsoleKey.Escape);
-        //}
 
         public override void FindPassengersByName()
         {
@@ -634,7 +569,7 @@ namespace KRZHK.AirlineManager.PassengersManagers
 
             if (!isFound)
             {
-                Console.WriteLine(" The flight hasn't been found.");
+                Console.WriteLine(" The passenger hasn't been found.");
             }
             else {
                 Console.WriteLine(" The passenger has been found, press any key to edit the information.");

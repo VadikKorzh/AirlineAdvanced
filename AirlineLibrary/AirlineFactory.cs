@@ -112,7 +112,7 @@ namespace KRZHK.AirlineLibrary
             return passengers;
         }
 
-        public Airline CreateAndPopulateAirline(int numberOfFlights)
+        public Airline Create(int numberOfFlights)
         {
             Airline airline = new Airline(numberOfFlights);
             PopulateAirline(airline);

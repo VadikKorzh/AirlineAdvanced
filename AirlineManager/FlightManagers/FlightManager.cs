@@ -1,17 +1,17 @@
 ﻿using KRZHK.AirlineLibrary;
-using KRZHK.AirlineManager.PassengersManagers;
+using KRZHK.AirlineManager.PassengerManagers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KRZHK.AirlineManager.FlightsManagers
+namespace KRZHK.AirlineManager.FlightManagers
 {
-    abstract class FlightsManager
+    abstract class FlightManager
     {
         protected Airline _airline;
-        protected PassengersManager _passengersManager;
+        protected PassengerManager _passengersManager;
 
         abstract public void FindFlightsByEconomyClassPrice();
 

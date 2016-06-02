@@ -17,7 +17,6 @@ namespace KRZHK.AirlineLibrary
         public DateTime Birthday { get; private set; }
         public Sex Sex { get; private set; }
         public FlightTicket Ticket { get; set; }
-        //public int FlightNumber { get; private set; }
 
         public Passenger(string firstName, string lastName, string nationality, string passport, DateTime birthday,
                          Sex sex, FlightTicket ticket)
@@ -43,10 +42,5 @@ namespace KRZHK.AirlineLibrary
             resultString.Append($" Ticket: {Ticket} ]");
             return resultString.ToString();
         }
-
-        //public Passenger Clone()
-        //{
-        //    return new Passenger(FirstName, LastName, Nationality, Passport, Birthday, Sex, Ticket, FlightNumber);
-        //}
     }
 }
